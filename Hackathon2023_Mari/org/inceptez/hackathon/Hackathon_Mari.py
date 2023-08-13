@@ -45,9 +45,9 @@ print(f"3 Footer record removed ")
 print(f"4 Display the count and show few rows and check whether header and footer removed")
 cnt4 = insuredata1b.count()
 print(f" First record of the RDD1 is : {insuredata1b.first()} - This is not a header record")
-istailer = insuredata1b.zipWithIndex().filter(lambda x: x[1] == (cnt4-1))
+istailer = insuredata1b.zipWithIndex().filter(lambda x: x[1] == cnt4)
 print(f" Last record of the RDD1 is : {istailer.collect()} - This is not a footer record")
-print(f" Count of the RDD2 after header and Trailer removed is : {cnt4} ")
+print(f" Count of the RDD2 after header and Trailer removed is : {cnt4}")
 
 print(f"5 Remove the blank lines in the rdd ")
 insuredata1c = insuredata1b.filter(lambda line: len(line[0].strip()) > 0)
@@ -101,11 +101,11 @@ insuredata2b = insuredata2a.zipWithIndex().filter(lambda x: x[1] != cnt3)
 print(f"3 Footer record removed ")
 
 print(f"4 Display the count and show few rows and check whether header and footer removed")
-cnt4 = insuredata2b.count()-1
-print(f" First record of the RDD2 is : {insuredata2b.first()} - This is not a header record")  # should not be a header record
+cnt4 = insuredata2b.count()
+print(f" First record of the RDD2 is : {insuredata2b.first()} - This is not a header record")
 istailer2 = insuredata2b.zipWithIndex().filter(lambda x: x[1] == cnt4)
-print(f" Last record of the RDD2 is : {print(istailer2.collect())} - This is not a footer record")
-print(f" Count of the RDD2 after header and Trailer removed is : {print(insuredata2b.count())} ")
+print(f" Last record of the RDD2 is : {istailer2.collect()} - This is not a footer record")
+print(f" Count of the RDD2 after header and Trailer removed is : {insuredata2b.count()} ")
 
 print(f"5 Remove the blank lines in the rdd ")
 insuredata2c = insuredata2b.filter(lambda line: len(line[0].strip()) > 0)
@@ -135,7 +135,6 @@ print(f"filter the records that contains blank or null IssuerId,IssuerId2 for eg
 print(f"with the field names used as per the header record in the file and apply to the above data to create schemaed RDD")
 
 schema_RDD = insuredata2e.map(lambda x:(x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9]))
-print(schema_RDD.take(10))
 
 insuredata2f = schema_RDD.filter(lambda row: row[0].strip() != "" and row[0] is not None).filter(lambda row: row[1].strip() != "" and row[1] is not None)
 print(insuredata2f.take(10))
@@ -149,9 +148,8 @@ insuredatamerged = insuredata1e.union(insuredata2f)
 cnt12 = insuredatamerged.count()
 print(f"Count of merged RDDs insuredata1 and insuredata2 after cleanup is :{cnt12}")
 
-print(f"13 Persist the step 12 RDD to memory by serializing ")
 insuredatamerged_persisted = insuredatamerged.persist(StorageLevel.MEMORY_ONLY)
-print(insuredatamerged_persisted)
+print(f"13 Persist the RDD to memory by serializing  - {insuredatamerged_persisted}")
 #insuredatamerged.persist()
 
 print(f"14. Calculate the count of rdds created in step 8+11 and rdd in step 12, check whether they are matching ")
@@ -185,7 +183,7 @@ target_business_date2 = '01-10-2019'
 rdd_20191002 = insuredatarepart.filter(lambda x: x[2] == target_business_date2)
 print(rdd_20191002.take(10))
 
-print(f"17. Store the RDDs insuredatarepart, rdd_20191001 and rdd_20191002 created in step 15, 16 into HDFS location ")
+print(f"17. Stored the RDDs insuredatarepart, rdd_20191001 and rdd_20191002 created in step 15, 16 into HDFS location ")
 
 hdfs_output_path = "hdfs:///user/hduser/sparkhack2/"
 from py4j.java_gateway import java_import
@@ -213,7 +211,7 @@ file_path_to_store = hdfs_output_path+"/rdd_20191002"
 deletehdfsfile(file_path_to_store)
 rdd_20191002.saveAsTextFile(file_path_to_store)
 
-print(f"18 Convert the RDDs created in step 15 above into Dataframe namely insuredaterepartdf using rdd.toDF() function")
+print(f"18 Converted the RDDs created in step 15 above into Dataframe namely insuredaterepartdf using rdd.toDF() function")
 collist=("IssuerId","IssuerId2","BusinessDate","StateCode","SourceName","NetworkName","NetworkURL","custnum","MarketCoverage","DentalOnlyPlan")
 insuredaterepartdf=insuredatarepart.toDF(collist)
 
@@ -222,9 +220,9 @@ print(f"         ===============================================")
 print(f"Apply Structure, DSL column management functions, transformation, custom udf & schema migration")
 print(f"-----------------------------------------------------------------------------------------------")
 print(f"19. Dataframe creation using the built-in modules")
+# Hint: Do it carefully without making typo mistakes. Fields issuerid, issuerid2 should be of IntegerType, businessDate should be DateType and all other fields are StringType.
 print(f"A. Create first structuretypes for all the columns as per the insuranceinfo1.csv with the columns such as")
 print(f"IssuerId,IssuerId2,BusinessDate,StateCode,SourceName,NetworkName,NetworkURL,custnum,MarketCoverage,DentalOnlyPlan")
-# Hint: Do it carefully without making typo mistakes. Fields issuerid, issuerid2 should be of IntegerType, businessDate should be DateType and all other fields are StringType.
 
 instructtype1 = StructType([StructField("IssuerId", IntegerType(), False),
                             StructField("IssuerId2", IntegerType(), False),
@@ -236,7 +234,7 @@ instructtype1 = StructType([StructField("IssuerId", IntegerType(), False),
                             StructField("custnum", StringType(), True),
                             StructField("MarketCoverage", StringType(), True),
                             StructField("DentalOnlyPlan", StringType(), True)])
-
+print(instructtype1)
 
 print(f"B. Create second structuretypes for all the columns as per the insuranceinfo2.csv with the columns such as")
 print(f"IssuerId,IssuerId2,BusinessDate,StateCode,SourceName,NetworkName,NetworkURL,custnum,MarketCoverage,DentalOnlyPlan")
@@ -252,7 +250,7 @@ instructtype2 = StructType([StructField("IssuerId", IntegerType(), False),
                             StructField("custnum", StringType(), True),
                             StructField("MarketCoverage", StringType(), True),
                             StructField("DentalOnlyPlan", StringType(), True)])
-
+print(instructtype2)
 print(f"C. Create third structuretypes for all the columns as per the insuranceinfo2.csv with the columns such as")
 print(f"IssuerId,IssuerId2,BusinessDate,StateCode,SourceName,NetworkName,NetworkURL,custnum,MarketCoverage,DentalOnlyPlan,RejectRows")
 # Hint: Do it carefully without making typo mistakes. Fields issuerid, issuerid2 should be of IntegerType, businessDate should be StringType and all other fields are StringType.
@@ -268,6 +266,7 @@ instructtype2a = StructType([StructField("IssuerId", IntegerType(), False),
                             StructField("MarketCoverage", StringType(), True),
                             StructField("DentalOnlyPlan", StringType(), True),
                             StructField("RejectRows", StringType(), True)])
+print(instructtype2a)
 
 print(f"20. Create dataframe using csv module accessing the insuranceinfo1.csv file and remove the footer from both using header true and remove the footer using dropmalformed ")
 print(f"options and apply the schema of the structure type created in the step 19.A")
@@ -275,7 +274,6 @@ path1 = "file:///home/hduser/Documents/hackathon_data_2023/insuranceinfo1.csv"
 path2 = "file:///home/hduser/Documents/hackathon_data_2023/insuranceinfo2.csv"
 
 insuredf1=spark.read.csv(path1,mode='dropmalformed',schema=instructtype1,header=True)
-insuredf1.printSchema()
 insuredf1.show(20,False)
 print(f"Create another dataframe using csv module accessing the insuranceinfo2.csv file. Remove header from dataframes using header true and remove footer using dropmalformed options")
 print(f"and apply the schema of the structure type created in the # step 19.B")
@@ -283,7 +281,6 @@ print(f"and apply the schema of the structure type created in the # step 19.B")
 
 insuredf2_t=spark.read.csv(path2,mode='dropmalformed',schema=instructtype2,header=True)
 insuredf2=insuredf2_t.withColumn("BusinessDate",to_date("BusinessDate",'MM-dd-yyyy'))
-insuredf2.printSchema()
 insuredf2.show(20,False)
 print(f"Create another dataframe using the csv accessing the insuranceinfo2.csv file and remove the header from the dataframe using header true, permissive options and apply")
 print(f"the schema of the structure type created in the step 19.C with the csv options of I. columnnameofcorruptrecord and store the rejected data in a new DF")
@@ -375,20 +372,21 @@ print(f" The string after cleansing :{cleaned_string}")
 
 print(f" 25. Call the udf remspecialchar in the DSL by passing NetworkName column as an argument to get the special characters removed DF")
 from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+from pyspark.sql.functions import col
 #Convert the above function as a user defined function (which is DF-DSL ready)
 remspecialcharfunc=udf(remspecialchar, StringType())
 writetofilefunc=udf(writetofile)
 
 insuredf3_allnonulls_enriched_df=insuredf3_allnonulls.withColumn("NetworkName",remspecialcharfunc("NetworkName"))
 #insuredf3_allnonulls_enriched_df.show(10)
+print(f"25. Step to cleanse NetworkName column from insuredf3_allnonulls dataframe is completed ")
 
-print(f" Step 25 to cleanse NetworkName column from insuredf3_allnonulls dataframe is completed ")
 print(f"26. Save the DF generated in step 25 in JSON format into HDFS with overwrite option")
-
-print(f"27. Save the DF generated in step 25 into CSV and json format with header name as per the DF and delimited by ~ into HDFS with overwrite option")
 writetofilefunc('json','/user/hduser/sparkhack2/insuredf3_allnonulls_enriched_df.json','','overwrite','insuredf3_allnonulls_enriched_df')
 print(f"Call a generic function to save the dataframe insuredf3_allnonulls_enriched_df as json format into HDFS location - completed")
 
+print(f"27. Save the DF generated in step 25 into CSV format with header name as per the DF and delimited by ~ into HDFS with overwrite option")
 writetofilefunc('csv','/user/hduser/sparkhack2/insuredf3_allnonulls_enriched_df.csv','~','overwrite','insuredf3_allnonulls_enriched_df')
 print(f"Call a generic function to save the dataframe insuredf3_allnonulls_enriched_df as CSV format into HDFS location - completed")
 
@@ -403,8 +401,8 @@ print(f"Stored the DF insuredf3_allnonulls_enriched into Hive table default.insu
 result = spark.sql("SELECT * FROM default.insuredf3_allnonulls_enriched")
 result.show(10)
 
-print(f"4. Tale of handling RDDs, DFs and TempViews")
-print(f"===========================================")
+print(f"                 4. Tale of handling RDDs, DFs and TempViews")
+print(f"                 ===========================================")
 print(f"Loading RDDs, split RDDs, Load DFs, Split DFs, Load Views, Split Views, write UDF, register to use in Spark SQL, Transform, Aggregate, store in disk/DB")
 print(f"-------------------------------------------------------------------------------------------------------------------------------------------------------")
 #Use RDD functions:
@@ -430,17 +428,17 @@ custfilter = processed_data.filter(lambda x: x[0] == "customer").map(lambda x: x
 statesfilter = processed_data.filter(lambda x: x[0] == "state").map(lambda x: x[1])
 
 print("Filtered customer RDD from customer data *****")
-custfilter.take(10)
+custfilter.collect()
 
 print("Filtered State RDD from customer data ******")
-statesfilter.take(10)
+statesfilter.collect()
 
 print(f"Use DSL functions ")
 print(f"31. Load the file3 (custs_states.csv) from the HDFS location, using CSV Module in a DF custstatesdf, this file contains 2 type of data one with 5 columns contains customer")
 print(f"master info and other data with statecode and description of 2 columns")
 
 custstatesdf = spark.read.csv(path)
-custstatesdf.show(20)
+custstatesdf.show(10)
 
 print(f"32. Split the above data into 2 DFs, first DF namely custfilterdf should be loaded only with 5 columns data and second DF namely statesfilterdf should be only loaded with 2 columns data")
 # Hint: Use filter/where DSL function to check isnull or isnotnull to achieve the above functionality then rename, change the type and drop columns in the above 2 DFs accordingly.
@@ -448,11 +446,11 @@ print(f"32. Split the above data into 2 DFs, first DF namely custfilterdf should
 print("Filtered customer DF from customer data with enriched cloumn names  *****")
 custfilterdf = custstatesdf.filter(col("_c0").isNotNull() & col("_c1").isNotNull() & col("_c2").isNotNull() & col("_c3").isNotNull() & col("_c4").isNotNull()) \
               .select(col("_c0").alias("custid"), col("_c1").alias("fname"),col("_c2").alias("lname"), col("_c3").alias("age"),col("_c4").alias("profession"))
-custfilterdf.show()
+custfilterdf.show(10)
 
 print("Filtered State DF from customer data with enriched column names  ******")
 statesfilterdf = custstatesdf.filter(col("_c2").isNull() & col("_c3").isNull()).select(col("_c0").alias("statecode"), col("_c1").alias("statedesc"))
-statesfilterdf.show()
+statesfilterdf.show(10)
 
 print(f"se SQL Queries")
 print(f"33. Register the above filtered customer and state data of two DFs as temporary views as custview and statesview")
@@ -546,47 +544,7 @@ print(f"number partitioned based on protocol and ordered based on count descendi
 # 2,72.3,300, Colorado,http,Economist
 # 1,48.4,3000, Atlanta,https,Health worker
 # 2,72.3,2000, New Jersey,https,Economist
-'''
-professional_result_df=spark.sql("""
-WITH ranked_data AS (
-  SELECT
-    statedesc,
-    protocol,
-    profession,
-    AVG(age) AS avg_age,
-    COUNT(*) AS count,
-    ROW_NUMBER() OVER (PARTITION BY protocol ORDER BY COUNT(*) DESC) AS seqno
-  FROM
-    insureview_upd
-  GROUP BY
-    statedesc, protocol, profession
-)
-SELECT
-  statedesc,
-  protocol,
-  profession,
-  avg_age,
-  count,
-  seqno
-FROM
-  ranked_data
-ORDER BY
-  statedesc, protocol
-""")
 
-professional_result_df=spark.sql("""
-    SELECT s.statedesc,
-           i.protocol,
-           c.profession,
-           AVG(c.age) AS avg_age,
-           COUNT(*) AS count,
-           ROW_NUMBER() OVER (PARTITION BY i.protocol, c.profession ORDER BY COUNT(*) DESC) AS seqno
-    FROM insureview_upd i
-    INNER JOIN statesview s ON i.stcd = s.statecode
-    INNER JOIN custview c ON i.custnum = c.custid
-    GROUP BY s.statedesc, i.protocol,c.profession
-    """)
-'''
 professional_result_df=spark.sql("""select * from 
                                                 (select row_number() over(partition by protocol order by count(Age) desc) seqno,
                                                     avg(Age) avg_age, count(Age) as count, statedesc, protocol, Profession
