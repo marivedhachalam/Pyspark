@@ -44,10 +44,10 @@ print(f"3 Footer record removed ")
 
 print(f"4 Display the count and show few rows and check whether header and footer removed")
 cnt4 = insuredata1b.count()
-print(f" First record of the RDD1 is : {insuredata1b.first()} - This is not a header record")  # should not be a header record
-istailer = insuredata1b.zipWithIndex().filter(lambda x: x[1] == cnt4)
-print(f" Last record of the RDD1 is : {print(istailer.collect())} - This is not a footer record")
-print(f" Count of the RDD2 after header and Trailer removed is : {print(insuredata1b.count())} ")
+print(f" First record of the RDD1 is : {insuredata1b.first()} - This is not a header record")
+istailer = insuredata1b.zipWithIndex().filter(lambda x: x[1] == (cnt4-1))
+print(f" Last record of the RDD1 is : {istailer.collect()} - This is not a footer record")
+print(f" Count of the RDD2 after header and Trailer removed is : {cnt4} ")
 
 print(f"5 Remove the blank lines in the rdd ")
 insuredata1c = insuredata1b.filter(lambda line: len(line[0].strip()) > 0)
