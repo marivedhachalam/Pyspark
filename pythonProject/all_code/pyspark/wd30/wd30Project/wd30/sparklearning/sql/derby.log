@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Wed Jul 26 06:54:31 IST 2023:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0189-8fcc-2d38-00000fd972f0 
+on database directory /home/hduser/PycharmProjects/wd30Project/wd30/sparklearning/sql/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@123645fe 
+Loaded from file:/home/hduser/PycharmProjects/wd28Project/venv/lib/python3.6/site-packages/pyspark/jars/derby-10.12.1.1.jar
+java.vendor=Red Hat, Inc.
+java.runtime.version=1.8.0_272-b10
+user.dir=/home/hduser/PycharmProjects/wd30Project/wd30/sparklearning/sql
+os.name=Linux
+os.arch=amd64
+os.version=3.10.0-514.el7.x86_64
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
